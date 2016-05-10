@@ -25,6 +25,8 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.RectF;
+import android.graphics.Region;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -58,7 +60,9 @@ public class WaveView extends View {
     public enum ShapeType {
         CIRCLE,
         SQUARE,
-        BOTTLE
+        BOTTLE,
+        DROP,
+        GLASS
     }
 
     // if true, the shader will display the wave
@@ -307,8 +311,17 @@ public class WaveView extends View {
                     break;
                 case BOTTLE:
 // 80
-                    drawBottle(canvas, 135, 260);
+                    drawScalableBottle(canvas, 135, 260);
+                    //drawBottle(canvas);
 
+                    break;
+                case DROP:
+
+                    drawDrop(canvas);
+
+                    break;
+                case GLASS:
+                    drawGlass(canvas);
                     break;
             }
         } else {
@@ -316,27 +329,131 @@ public class WaveView extends View {
         }
     }
 
-    private void drawBottle(Canvas canvas, int x, int y) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.d("TAG_HEIGHT", String.valueOf(MeasureSpec.getSize(heightMeasureSpec)));
+        Log.d("TAG_WIDTH", String.valueOf(MeasureSpec.getSize(widthMeasureSpec)));
+    }
+
+    private void drawBottle(Canvas canvas) {
         Path path = new Path();
 
         mViewPaint.setStyle(Style.FILL_AND_STROKE);
         path.moveTo(getWidth() / 2 + 50, getTop() + 20);
         path.lineTo(getWidth() / 2 - 45, getTop() + 20); //1-2
-        path.quadTo(getWidth() / 2 - x - 30, getTop() + y, getWidth() / 2 - 130, getTop() + 20 + 300); //2-3
-        path.lineTo(getWidth() / 2 - x, getTop() + 700); //3-7
-        //path.lineTo(getWidth() / 2 + 135, getTop() + 700); //7-10
+        path.quadTo(getWidth() / 2 - 160, getTop() + 265, getWidth() / 2 - 136, 320); //2-3
+        path.lineTo(getWidth() / 2 - 135, getTop() + 700); //3-7
 
+        path.quadTo(getWidth() / 2 - 110, getTop() + 762, getWidth() / 2 - 60, getTop() + 700); //7-8
+        path.quadTo(getWidth() / 2, getTop() + 762, getWidth() / 2 + 60, getTop() + 700); //8-9
+        path.quadTo(getWidth() / 2 + 110, getTop() + 762, getWidth() / 2 + 138, getTop() + 700); //9-10
 
-        path.quadTo(getWidth() / 2 - 105, getTop() + 755, getWidth() / 2 - 60, getTop() + 700); //7-8
-        path.quadTo(getWidth() / 2, getTop() + 755, getWidth() / 2 + 70, getTop() + 700); //8-9
-        path.quadTo(getWidth() / 2 + 105, getTop() + 755, getWidth() / 2 + 135, getTop() + 700); //9-10 //9-10
+        path.lineTo(getWidth() / 2 + 138, getTop() + 320); //10-14
+        path.quadTo(getWidth() / 2 + 160, getTop() + 265, getWidth() / 2 + 50, getTop() + 25); //14-1
+        canvas.drawPath(path, mViewPaint);
 
+        canvas.drawCircle(getWidth() / 2 - 135, getTop() + 260, 5, mViewPaint);
+        canvas.drawCircle(getWidth() / 2 + 135, getTop() + 260, 5, mViewPaint);
 
-        path.lineTo(getWidth() / 2 + x, getTop() + 320); //10-14
-        path.quadTo(getWidth() / 2 + x + 30, getTop() + y, getWidth() / 2 + 50, getTop() + 20); //14-1
+        canvas.drawPath(path, mViewPaint);
+    }
+
+    private void drawScalableBottle(Canvas canvas, int x, int y) {
+        Path path = new Path();
+
+        float halfWidth = getWidth() / 2;
+
+        float scalableWidthPlus45 = (float) (halfWidth / 0.9146341);
+        float scalableWidthMinus40 = (float) (halfWidth / 1.117403);
+        float scalableWidthMinus158 = (float) (halfWidth / 1.785714);
+        float scalableWidthMinus136 = (float) (halfWidth / 1.569038);
+        float scalableWidthPlus160 = (float) (halfWidth / 0.7009346);
+        float scalableWidthMinus60 = (float) (halfWidth / 1.190476);
+        float scalableWidthPlus60 = (float) (halfWidth / 0.862069);
+        float scalableWidthMinus110 = (float) (halfWidth / 1.415094);
+        float scalableWidthPlus110 = (float) (halfWidth / 0.7731959);
+        float scalableWidthPlus138 = (float) (halfWidth / 0.7309942);
+
+        float scalableHeight20 = (float) (getHeight() / 37.5);
+        float scalableHeight200 = (float) (getHeight() / 3.75);
+        float scalableHeight265 = (float) (getHeight() / 2.830186);
+        float scalableHeight320 = (float) (getHeight() / 2.34375);
+        float scalableHeight700 = (float) (getHeight() / 1.071429);
+        float scalableHeight762 = (float) (getHeight() / 0.984252);
+
+        mViewPaint.setStyle(Style.FILL_AND_STROKE);
+        path.moveTo(scalableWidthPlus45, scalableHeight20);
+        path.lineTo(scalableWidthMinus40, scalableHeight20); //1-2
+        path.quadTo(scalableWidthMinus158, scalableHeight265, scalableWidthMinus136, scalableHeight320); //2-3
+        path.lineTo(scalableWidthMinus136, scalableHeight700); //3-7
+
+        path.quadTo(scalableWidthMinus110, scalableHeight762, scalableWidthMinus60, scalableHeight700); //7-8
+        path.quadTo(getWidth() / 2, scalableHeight762, scalableWidthPlus60, scalableHeight700); //8-9
+        path.quadTo(scalableWidthPlus110, scalableHeight762, scalableWidthPlus138, scalableHeight700); //9-10
+
+        path.lineTo(scalableWidthPlus138, scalableHeight320); //10-14
+        path.quadTo(scalableWidthPlus160, scalableHeight200, scalableWidthPlus45, scalableHeight20); //14-1
         canvas.drawPath(path, mViewPaint);
 
         canvas.drawCircle(getWidth() / 2 - x, getTop() + y, 5, mViewPaint);
         canvas.drawCircle(getWidth() / 2 + x, getTop() + y, 5, mViewPaint);
+    }
+
+    private void drawDrop(Canvas canvas) {
+        Path path = new Path();
+
+        float halfWidth = getWidth() / 2;
+
+        float scalableWidthMinus200 = (float) (halfWidth / 2.5);
+        float scalableWidthMinus5 = (float) (halfWidth / 1.013514);
+        float scalableWidthPlus5 = (float) (halfWidth / 0.9868421);
+        float scalableWidthMinus230 = (float) (halfWidth / 2.586207);
+        float scalableWidthMinus150 = (float) (halfWidth / 1.666667);
+        float scalableWidthPlus150 = (float) (halfWidth / 0.7009346);
+        float scalableWidthPlus225 = (float) (halfWidth / 0.625);
+
+        float scalableHeight20 = (float) (getHeight() / 37.5);
+        float scalableHeight40 = (float) (getHeight() / 18.75);
+        float scalableHeight400 = (float) (getHeight() / 1.875);
+        float scalableHeight475 = (float) (getHeight() / 1.578947);
+        float scalableHeight748 = (float) (getHeight() / 1.002674);
+        float scalableHeight700 = (float) (getHeight() / 1.071429);
+        float scalableHeight740 = (float) (getHeight() / 1.013514);
+
+        mViewPaint.setStyle(Style.FILL_AND_STROKE);
+        path.moveTo(halfWidth, scalableHeight20);
+        path.lineTo(scalableWidthMinus5, scalableHeight40);
+        path.lineTo(scalableWidthMinus200, scalableHeight400);
+        path.lineTo(scalableWidthMinus230, scalableHeight475);
+        path.quadTo(scalableWidthMinus150, scalableHeight748, halfWidth, scalableHeight700);
+        path.quadTo(scalableWidthPlus150, scalableHeight740, scalableWidthPlus225, scalableHeight475);
+        path.lineTo(scalableWidthPlus225, scalableHeight400);
+        path.lineTo(scalableWidthPlus5, scalableHeight40);
+        path.lineTo(halfWidth, 20);
+        canvas.drawPath(path, mViewPaint);
+    }
+
+    private void drawGlass(Canvas canvas) {
+        Path path = new Path();
+
+        float halfWidth = getWidth() / 2;
+
+        float scalableWidthMinus240 = (float) (halfWidth / 2.777778);
+        float scalableWidthPlus240 = (float) (halfWidth / 0.6097561);
+        float scalableWidthMinus193 = (float) (halfWidth / 2.06044);
+        float scalableWidthPlus193 = (float) (halfWidth / 0.6602113);
+
+        float scalableHeight80 = (float) (getHeight() / 9.375);
+        float scalableHeight700 = (float) (getHeight() / 1.111111);
+
+        mViewPaint.setStyle(Style.FILL_AND_STROKE);
+        path.moveTo(halfWidth, scalableHeight80);
+        path.lineTo(scalableWidthMinus240, scalableHeight80);
+        path.lineTo(scalableWidthMinus193-1, scalableHeight700);
+        path.lineTo(scalableWidthPlus193, scalableHeight700);
+        path.lineTo(scalableWidthPlus240, scalableHeight80);
+        path.lineTo(halfWidth, scalableHeight80);
+        canvas.drawPath(path, mViewPaint);
     }
 }

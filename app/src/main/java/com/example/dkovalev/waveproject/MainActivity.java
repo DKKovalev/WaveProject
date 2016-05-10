@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity {
         final WaveView waveView = (WaveView) findViewById(R.id.waveview);
 
         ImageView imageFill = (ImageView) findViewById(R.id.image_fill);
-        Picasso.with(this).load(R.drawable.water_botle_fill).into(imageFill);
+        Picasso.with(this).load(R.drawable.water_drop_fill).into(imageFill);
 
         ImageView imageFront = (ImageView) findViewById(R.id.image_front);
-        Picasso.with(this).load(R.drawable.water_botle).into(imageFront);
+        Picasso.with(this).load(R.drawable.water_drop).into(imageFront);
 
 
         waterCurtain = (WaterCurtain) findViewById(R.id.image_curtain);
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         waveView.setWaterLevelRatio(0);
         waveView.setAmplitudeRatio(0.02f);
         waveHelper = new WaveHelper(waveView);
-        waveView.setShapeType(WaveView.ShapeType.BOTTLE);
+        waveView.setShapeType(WaveView.ShapeType.DROP);
     }
 
     private float getRounded(float f) {
@@ -104,4 +104,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         waveHelper.cancel();
     }
+
+
 }
